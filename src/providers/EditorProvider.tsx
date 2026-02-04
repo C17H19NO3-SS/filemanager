@@ -150,6 +150,12 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
       ?.setAttribute("content", targetTheme["--bg-secondary"]);
   }, [settings.theme]);
 
+  // Global Font Size Management
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.fontSize = `${settings.fontSize}px`;
+  }, [settings.fontSize]);
+
   const setWorkspace = (path: string) => {
     setWorkspaceState(path);
     localStorage.setItem("current-workspace", path);
