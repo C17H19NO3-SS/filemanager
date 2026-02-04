@@ -25,7 +25,7 @@ export const Header = () => {
 
   return (
     <header
-      className="flex items-center justify-between h-[35px] px-3 select-none border-b z-50 transition-colors"
+      className="flex items-center justify-between h-8.75 px-3 select-none border-b z-50 transition-colors"
       style={{
         backgroundColor: "var(--bg-secondary)",
         color: "var(--text-primary)",

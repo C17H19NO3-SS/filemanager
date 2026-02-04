@@ -41,6 +41,7 @@ interface EditorContextType {
   openFiles: string[];
   closeFile: (path: string) => void;
   files: string[];
+  setFiles: (files: string[]) => void;
   content: string;
   setContent: (content: string) => void;
   saveFile: () => void;
@@ -61,6 +62,8 @@ interface EditorContextType {
   formatFile: () => Promise<void>;
   lintResults: LintResult[];
   setLintResults: (results: LintResult[]) => void;
+  unsavedChanges: Set<string>;
+  setUnsavedChanges: (changes: Set<string>) => void;
 }
 
 const EditorContext = createContext<EditorContextType | undefined>(undefined);
@@ -69,7 +72,15 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const [activeFile, setActiveFileState] = useState<string | null>(null);
   const [openFiles, setOpenFiles] = useState<string[]>([]);
   const [files, setFiles] = useState<string[]>([]);
-  const [content, setContent] = useState<string>("");
+  const [content, setContentState] = useState<string>("");
+  const [unsavedChanges, setUnsavedChanges] = useState<Set<string>>(new Set());
+
+  const setContent = (newContent: string) => {
+    setContentState(newContent);
+    if (activeFile) {
+      setUnsavedChanges((prev) => new Set(prev).add(activeFile));
+    }
+  };
 
   const setActiveFile = (path: string | null) => {
     setActiveFileState(path);
@@ -79,6 +90,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const closeFile = (path: string) => {
+    // Logic for actual closure
     setOpenFiles((prev) => {
       const newOpenFiles = prev.filter((f) => f !== path);
       if (activeFile === path) {
@@ -87,10 +99,16 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
           setActiveFileState(lastFile || null);
         } else {
           setActiveFileState(null);
-          setContent("");
+          setContentState("");
         }
       }
       return newOpenFiles;
+    });
+    // Remove from unsaved set if forced closed
+    setUnsavedChanges((prev) => {
+      const next = new Set(prev);
+      next.delete(path);
+      return next;
     });
   };
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -138,6 +156,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   // Global Theme Management
   useEffect(() => {
     const targetTheme = THEMES[settings.theme] || THEMES["vscode-dark-plus"];
+    if (!targetTheme) return;
+
     const root = document.documentElement;
 
     Object.entries(targetTheme).forEach(([key, value]) => {
@@ -147,7 +167,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     // Also update meta theme-color
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", targetTheme["--bg-secondary"]);
+      ?.setAttribute("content", targetTheme["--bg-secondary"] || "");
   }, [settings.theme]);
 
   // Global Font Size Management
@@ -336,7 +356,12 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
           body: JSON.stringify({ path: activeFile, content }),
         });
 
-        console.log(`Saved and synced ${activeFile}`);
+        console.log("Saved file", activeFile);
+        setUnsavedChanges((prev) => {
+          const next = new Set(prev);
+          next.delete(activeFile);
+          return next;
+        });
       } catch (e) {
         console.error("Save failed", e);
       }
@@ -395,21 +420,15 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const fetchFileContent = async (filePath: string): Promise<string> => {
+  const fetchFileContent = async (path: string): Promise<string> => {
     try {
-      const currentData = vol.readFileSync(filePath, "utf8");
-      if (currentData !== "") return currentData as string;
-
-      const res = await fetch(
-        `/api/files/content?path=${encodeURIComponent(filePath)}`,
-        { headers: commonHeaders },
-      );
-      const { content: serverContent } = await res.json();
-      vol.writeFileSync(filePath, serverContent);
-      refreshFiles();
-      return serverContent;
+      const url = `/api/files/read?path=${encodeURIComponent(path)}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      setContent(data.content); // Use direct setter to avoid marking as unsaved on load
+      return data.content;
     } catch (e) {
-      console.error("fetchFileContent failed", e);
+      console.error("Fetch file failed", e);
       return "";
     }
   };
@@ -420,6 +439,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         activeFile,
         setActiveFile,
         files,
+        setFiles,
         content,
         setContent,
         saveFile,
@@ -440,6 +460,8 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
         formatFile,
         lintResults,
         setLintResults,
+        unsavedChanges,
+        setUnsavedChanges,
         openFiles,
         closeFile,
       }}

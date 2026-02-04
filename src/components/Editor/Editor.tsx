@@ -217,7 +217,8 @@ export const Editor = () => {
         if (pkg) {
           if (pkg.startsWith(".") || pkg.startsWith("@/")) {
             if (activeFile) {
-              const resolved = resolveLocalPath(pkg, activeFile);
+              const fileStr = activeFile; // Satisfy TS
+              const resolved = resolveLocalPath(pkg, fileStr);
               if (resolved && !resolved.endsWith("/"))
                 localPaths.push(resolved);
             }
@@ -510,6 +511,7 @@ export const Editor = () => {
       let match;
       while ((match = regex.exec(code)) !== null) {
         const word = match[1];
+        if (!word) continue;
         if (keywords.has(word)) continue; // Skip keywords like if(...)
 
         const startPos = model.getPositionAt(match.index);

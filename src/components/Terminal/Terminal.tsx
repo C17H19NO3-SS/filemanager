@@ -162,35 +162,14 @@ export const Terminal: React.FC<TerminalPanelProps> = ({ onClose }) => {
                 key={term.id}
                 onClick={() => setActiveId(term.id)}
                 className={`
-                group flex items-center gap-2 px-3 py-1.5 text-xs font-medium border-r cursor-pointer min-w-[100px] max-w-[200px]
+                group flex items-center gap-2 px-3 py-1.5 text-xs font-medium border-r cursor-pointer min-w-25 max-w-50 border-(--border-color)
+                ${activeId === term.id ? "bg-(--bg-primary) text-(--text-primary)" : "bg-(--bg-secondary) text-(--text-secondary)"}
+                hover:bg-(--bg-tertiary) hover:text-(--text-primary)
               `}
-                style={{
-                  backgroundColor:
-                    activeId === term.id
-                      ? "var(--bg-primary)"
-                      : "var(--bg-secondary)",
-                  color:
-                    activeId === term.id
-                      ? "var(--text-primary)"
-                      : "var(--text-secondary)",
-                  borderColor: "var(--border-color)",
-                }}
-                onMouseEnter={(e) => {
-                  if (activeId !== term.id) {
-                    e.currentTarget.style.backgroundColor =
-                      "var(--bg-tertiary)";
-                    e.currentTarget.style.color = "var(--text-primary)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activeId !== term.id) {
-                    e.currentTarget.style.backgroundColor =
-                      "var(--bg-secondary)";
-                    e.currentTarget.style.color = "var(--text-secondary)";
-                  }
-                }}
               >
-                <span className="truncate flex-1">{term.title}</span>
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <span className="truncate">{term.title || "Terminal"}</span>
+                </div>
                 <button
                   onClick={(e) => removeTerminal(e, term.id)}
                   className={`opacity-0 group-hover:opacity-100 p-0.5 rounded transition-colors ${

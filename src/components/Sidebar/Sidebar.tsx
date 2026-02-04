@@ -18,76 +18,21 @@ const FileIcon = ({
   isOpen?: boolean;
 }) => {
   if (isDirectory) {
-    if (name === "src") {
-      return (
-        <svg
-          className="w-4 h-4 text-orange-400"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-          <polyline points="9 11 7 13 9 15" />
-          <polyline points="13 11 15 13 13 15" />
-        </svg>
-      );
-    }
-    if (name === "components" || name === "providers" || name === "Layout") {
-      return (
-        <svg
-          className="w-4 h-4 text-emerald-400"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-          <circle cx="12" cy="13" r="2" />
-        </svg>
-      );
-    }
-    if (name === "node_modules") {
-      return (
-        <svg
-          className="w-4 h-4 text-emerald-600"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-          <path d="M12 11v4M10 13h4" />
-        </svg>
-      );
-    }
-    if (name === "helpers" || name === "utils") {
-      return (
-        <svg
-          className="w-4 h-4 text-purple-400"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-          <path d="M15 11l-3 3-3-3" />
-        </svg>
-      );
-    }
+    const isSpecial = [
+      "src",
+      "components",
+      "providers",
+      "Layout",
+      "utils",
+      "helpers",
+      "node_modules",
+    ].includes(name);
+    // Generic Folder Icon
     return (
       <svg
-        className={`w-4 h-4 ${isOpen ? "text-neutral-300" : "text-neutral-500"}`}
+        className={`w-4 h-4 ${isSpecial ? "text-blue-400" : isOpen ? "text-neutral-200" : "text-neutral-400"}`}
         viewBox="0 0 24 24"
-        fill="none"
+        fill={isOpen ? "currentColor" : "none"}
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
@@ -98,100 +43,164 @@ const FileIcon = ({
     );
   }
 
-  const ext = name.split(".").pop();
-  switch (ext) {
-    case "tsx":
-    case "jsx":
-      return (
-        <svg
-          className="w-4 h-4 text-blue-400"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="12" cy="12" r="2" />
-          <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" />
-          <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" strokeOpacity="0.5" />
-        </svg>
-      );
-    case "ts":
-      return (
-        <div className="w-4 h-4 bg-[#3178c6] flex items-center justify-center rounded-[2px] overflow-hidden">
-          <span className="text-white text-[9px] font-bold leading-none mt-1">
-            TS
-          </span>
-        </div>
-      );
-    case "css":
-      return (
-        <div className="w-4 h-4 bg-[#264de4] flex items-center justify-center rounded-[2px] overflow-hidden">
-          <span className="text-white text-[12px] font-bold leading-none">
-            #
-          </span>
-        </div>
-      );
-    case "html":
-      return (
-        <div className="w-4 h-4 bg-[#e34c26] flex items-center justify-center rounded-[2px] overflow-hidden">
-          <span className="text-white text-[10px] font-bold leading-none">
-            &lt;&gt;
-          </span>
-        </div>
-      );
-    case "json":
-    case "lock":
-      return (
-        <div className="w-4 h-4 text-[#cbcb41] flex items-center justify-center font-bold text-[12px]">
-          {"{ }"}
-        </div>
-      );
-    case "gitignore":
-      return (
-        <svg
-          className="w-4 h-4 text-[#f1502f]"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M18 6L6 18M6 6l12 12" />
-        </svg>
-      );
-    case "md":
-      return (
-        <svg
-          className="w-4 h-4 text-blue-300"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M21 5H3v14h18V5zM7 7v10M11 7l3 3 3-3M14 17h3" />
-        </svg>
-      );
-    default:
-      return (
-        <svg
-          className="w-4 h-4 text-neutral-400"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
-          <polyline points="13 2 13 9 20 9" />
-        </svg>
-      );
+  const ext = name.split(".").pop()?.toLowerCase();
+
+  // TypeScript
+  if (ext === "ts" || ext === "tsx") {
+    return (
+      <svg
+        className="w-4 h-4 text-blue-500"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <path d="M9 13v2" strokeWidth="2" />
+        <path d="M9 15h2" strokeWidth="1.5" />
+        <path d="M15 13l-1.5 2 1.5 2" strokeWidth="1.5" />
+      </svg>
+    );
   }
+
+  // JavaScript
+  if (ext === "js" || ext === "jsx" || ext === "mjs" || ext === "cjs") {
+    return (
+      <svg
+        className="w-4 h-4 text-yellow-400"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <path d="M10 13a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2" />
+        <path d="M16 13c-1 0-2 1-2 2v1c0 1 1 2 2 2" />
+      </svg>
+    );
+  }
+
+  // HTML
+  if (ext === "html" || ext === "htm") {
+    return (
+      <svg
+        className="w-4 h-4 text-orange-500"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <path d="M8 13l-2 2 2 2" />
+        <path d="M16 13l2 2-2 2" />
+      </svg>
+    );
+  }
+
+  // CSS / SCSS
+  if (ext === "css" || ext === "scss" || ext === "less" || ext === "sass") {
+    return (
+      <svg
+        className="w-4 h-4 text-blue-400"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <path d="M10 13l-2 2 2-2" />
+        <path d="M14 13l2 2-2-2" />
+      </svg>
+    );
+  }
+
+  // JSON
+  if (ext === "json" || name === ".lock") {
+    return (
+      <svg
+        className="w-4 h-4 text-yellow-300"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <path d="M10 12c-1 0-1.5.5-1.5 1s.5 1 1.5 1" />
+        <path d="M14 12c1 0 1.5.5 1.5 1s-.5 1-1.5 1" />
+      </svg>
+    );
+  }
+
+  // Markdown
+  if (ext === "md" || ext === "txt") {
+    return (
+      <svg
+        className="w-4 h-4 text-blue-300"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+        <polyline points="10 9 9 9 8 9" />
+      </svg>
+    );
+  }
+
+  // Images
+  if (["png", "jpg", "jpeg", "svg", "gif", "ico", "webp"].includes(ext || "")) {
+    return (
+      <svg
+        className="w-4 h-4 text-purple-400"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+        <polyline points="21 15 16 10 5 21" />
+      </svg>
+    );
+  }
+
+  // Default File
+  return (
+    <svg
+      className="w-4 h-4 text-neutral-400"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+      <polyline points="13 2 13 9 20 9" />
+    </svg>
+  );
 };
 
 const TreeItem = ({ node, depth }: { node: FileNode; depth: number }) => {
@@ -222,7 +231,7 @@ const TreeItem = ({ node, depth }: { node: FileNode; depth: number }) => {
   return (
     <div>
       <div
-        className={`flex items-center h-[22px] px-2 cursor-pointer group select-none relative transition-colors`}
+        className={`flex items-center h-5.5 px-2 cursor-pointer group select-none relative transition-colors`}
         style={{
           paddingLeft: `${paddingLeft}px`,
           backgroundColor: isSelected
@@ -247,7 +256,7 @@ const TreeItem = ({ node, depth }: { node: FileNode; depth: number }) => {
           Array.from({ length: depth }).map((_, i) => (
             <div
               key={i}
-              className="absolute top-0 bottom-0 border-l border-neutral-800/50"
+              className="absolute top-0 bottom-0 border-l border-(--border-color)/50"
               style={{ left: `${(i + 1) * 12 + 8}px` }}
             />
           ))}
@@ -350,17 +359,8 @@ export const Sidebar = () => {
   }, [files]);
 
   return (
-    <aside
-      className="w-full flex flex-col h-full border-r select-none"
-      style={{
-        backgroundColor: "var(--bg-secondary)",
-        borderColor: "var(--border-color)",
-      }}
-    >
-      <div
-        className="flex items-center justify-between px-4 py-2 group/header cursor-pointer h-9 transition-colors"
-        style={{ color: "var(--text-secondary)" }}
-      >
+    <aside className="w-full flex flex-col h-full border-r border-(--border-color) select-none bg-(--bg-secondary)">
+      <div className="flex items-center justify-between px-4 py-2 group/header cursor-pointer h-9 transition-colors text-(--text-secondary)">
         <div className="flex items-center gap-1.5 overflow-hidden">
           <svg
             className="w-3.5 h-3.5 shrink-0"
@@ -378,7 +378,7 @@ export const Sidebar = () => {
         <div className="flex items-center gap-0.5 opacity-0 group-hover/header:opacity-100 transition-opacity">
           <button
             onClick={() => createFile(prompt("Enter file name") || "")}
-            className="p-1 hover:bg-[#2a2d2e] rounded text-[#c5c5c5]"
+            className="p-1 hover:bg-(--bg-tertiary) rounded text-(--text-secondary)"
             title="New File"
           >
             <svg
@@ -392,7 +392,7 @@ export const Sidebar = () => {
             </svg>
           </button>
           <button
-            className="p-1 hover:bg-[#2a2d2e] rounded text-[#c5c5c5]"
+            className="p-1 hover:bg-(--bg-tertiary) rounded text-(--text-secondary)"
             title="New Folder"
           >
             <svg
@@ -408,7 +408,7 @@ export const Sidebar = () => {
           </button>
           <button
             onClick={() => window.location.reload()}
-            className="p-1 hover:bg-[#2a2d2e] rounded text-[#c5c5c5]"
+            className="p-1 hover:bg-(--bg-tertiary) rounded text-(--text-secondary)"
             title="Refresh"
           >
             <svg
@@ -423,7 +423,7 @@ export const Sidebar = () => {
             </svg>
           </button>
           <button
-            className="p-1 hover:bg-[#2a2d2e] rounded text-[#c5c5c5]"
+            className="p-1 hover:bg-(--bg-tertiary) rounded text-(--text-secondary)"
             title="Collapse All"
           >
             <svg

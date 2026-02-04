@@ -1,10 +1,29 @@
 import React, { useRef, useEffect } from "react";
 import { useEditor } from "@/providers/EditorProvider";
 import { X } from "lucide-react";
+import { ConfirmationModal } from "@/components/Modals/ConfirmationModal";
 
 export const TabBar: React.FC = () => {
-  const { openFiles, activeFile, setActiveFile, closeFile } = useEditor();
+  const { openFiles, activeFile, setActiveFile, closeFile, unsavedChanges } =
+    useEditor();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [fileToClose, setFileToClose] = React.useState<string | null>(null);
+
+  const handleCloseRequest = (path: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (unsavedChanges.has(path)) {
+      setFileToClose(path);
+    } else {
+      closeFile(path);
+    }
+  };
+
+  const handleConfirmClose = () => {
+    if (fileToClose) {
+      closeFile(fileToClose);
+      setFileToClose(null);
+    }
+  };
 
   useEffect(() => {
     if (activeFile && scrollRef.current) {
@@ -47,7 +66,7 @@ export const TabBar: React.FC = () => {
 
   return (
     <div
-      className="flex h-[35px] overflow-x-auto no-scrollbar border-b"
+      className="flex h-8.75 overflow-x-auto no-scrollbar border-b"
       ref={scrollRef}
       style={{
         backgroundColor: "var(--bg-secondary)",
@@ -67,7 +86,7 @@ export const TabBar: React.FC = () => {
               if (e.button === 1) {
                 // Middle click to close
                 e.preventDefault();
-                closeFile(path);
+                handleCloseRequest(path);
               }
             }}
             style={{
@@ -104,22 +123,41 @@ export const TabBar: React.FC = () => {
 
             <span className="truncate flex-1">{fileName}</span>
 
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                closeFile(path);
-              }}
-              className={`
-                ml-2 p-0.5 rounded-[3px] opacity-0 group-hover:opacity-100 
-                hover:bg-[#454545] transition-all flex items-center justify-center
-                ${isActive ? "opacity-100" : ""}
-              `}
-            >
-              <X size={14} />
-            </button>
+            {unsavedChanges.has(path) ? (
+              <button
+                onClick={(e) => handleCloseRequest(path, e)}
+                className={`
+                    ml-2 w-5 h-5 flex items-center justify-center rounded-sm
+                    hover:bg-[#454545] group/close transition-all
+                `}
+              >
+                <div className="w-2 h-2 rounded-full bg-white group-hover/close:hidden" />
+                <X size={14} className="hidden group-hover/close:block" />
+              </button>
+            ) : (
+              <button
+                onClick={(e) => handleCloseRequest(path, e)}
+                className={`
+                    ml-2 p-0.5 rounded-[3px] opacity-0 group-hover:opacity-100 
+                    hover:bg-[#454545] transition-all flex items-center justify-center
+                    ${isActive ? "opacity-100" : ""}
+                `}
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
         );
       })}
+
+      <ConfirmationModal
+        isOpen={!!fileToClose}
+        onClose={() => setFileToClose(null)}
+        onConfirm={handleConfirmClose}
+        title="Unsaved Changes"
+        message="You have unsaved changes in this file. Are you sure you want to close it? Your changes will be lost."
+        confirmLabel="Discard Changes"
+      />
     </div>
   );
 };
