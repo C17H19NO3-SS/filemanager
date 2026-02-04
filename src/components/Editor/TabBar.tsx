@@ -47,8 +47,12 @@ export const TabBar: React.FC = () => {
 
   return (
     <div
-      className="flex h-[35px] bg-[#252526] overflow-x-auto no-scrollbar border-b border-[#1e1e1e]"
+      className="flex h-[35px] overflow-x-auto no-scrollbar border-b"
       ref={scrollRef}
+      style={{
+        backgroundColor: "var(--bg-secondary)",
+        borderColor: "var(--bg-primary)",
+      }}
     >
       {openFiles.map((path) => {
         const isActive = activeFile === path;
@@ -69,17 +73,31 @@ export const TabBar: React.FC = () => {
             style={{
               maxWidth: "200px",
               minWidth: "120px",
-              backgroundColor: isActive ? "#1e1e1e" : "#2d2d2d",
-              color: isActive ? "#ffffff" : "#969696",
+              backgroundColor: isActive
+                ? "var(--bg-primary)"
+                : "var(--bg-input)",
+              color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
               borderTop: isActive
-                ? "1px solid #007acc"
+                ? "1px solid var(--accent-color)"
                 : "1px solid transparent",
+              borderColor: "var(--border-color)",
             }}
             className={`
-              flex items-center px-3 group cursor-pointer border-r border-[#1e1e1e] 
+              flex items-center px-3 group cursor-pointer border-r 
               select-none relative text-[13px] h-full transition-colors
-              ${!isActive && "hover:bg-[#2a2d2e] hover:text-[#cccccc]"}
             `}
+            onMouseEnter={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+                e.currentTarget.style.color = "var(--text-primary)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.backgroundColor = "var(--bg-input)";
+                e.currentTarget.style.color = "var(--text-secondary)";
+              }
+            }}
             title={path}
           >
             <div className="mr-2 shrink-0">{getFileIcon(path)}</div>

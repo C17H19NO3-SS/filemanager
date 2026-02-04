@@ -80,70 +80,132 @@ export const Terminal: React.FC<TerminalPanelProps> = ({ onClose }) => {
   if (terminals.length === 0) return null;
 
   return (
-    <div className="h-full w-full flex flex-col bg-[#1e1e1e] border-t border-neutral-800">
-      {/* Top Category Tabs (VS Code Style) */}
-      <div className="flex items-center px-4 bg-[#1e1e1e] h-9 gap-5 border-b border-white/5">
+    <div
+      className="h-full w-full flex flex-col border-t"
+      style={{
+        backgroundColor: "var(--bg-primary)",
+        borderColor: "var(--border-color)",
+      }}
+    >
+      {/* Top Categories */}
+      <div
+        className="flex items-center px-4 h-9 gap-5 border-b"
+        style={{
+          backgroundColor: "var(--bg-primary)",
+          borderColor: "var(--bg-tertiary)",
+        }}
+      >
         <button
           onClick={() => setActiveView("problems")}
-          className={`relative h-full text-[11px] flex items-center gap-1.5 transition-all outline-none ${
-            activeView === "problems"
-              ? "text-white"
-              : "text-[#858585] hover:text-[#cccccc]"
-          }`}
+          className={`relative h-full text-[11px] flex items-center gap-1.5 transition-all outline-none`}
+          style={{
+            color:
+              activeView === "problems"
+                ? "var(--text-primary)"
+                : "var(--text-secondary)",
+          }}
         >
           Problems
           {totalProblems > 0 && (
             <span
-              className={`text-white text-[10px] px-1.5 py-0 rounded-full min-w-4 text-center font-bold ${
-                activeView === "problems" ? "bg-[#007acc]" : "bg-[#4d4d4d]"
-              }`}
+              className={`text-[10px] px-1.5 py-0 rounded-full min-w-4 text-center font-bold`}
+              style={{
+                color: "white",
+                backgroundColor:
+                  activeView === "problems"
+                    ? "var(--accent-color)"
+                    : "var(--bg-tertiary)",
+              }}
             >
               {totalProblems}
             </span>
           )}
           {activeView === "problems" && (
-            <div className="absolute bottom-0 left-0 w-full h-px bg-[#007acc]" />
+            <div
+              className="absolute bottom-0 left-0 w-full h-px"
+              style={{ backgroundColor: "var(--accent-color)" }}
+            />
           )}
         </button>
 
         <button
           onClick={() => setActiveView("terminal")}
-          className={`relative h-full text-[11px] flex items-center transition-all outline-none ${
-            activeView === "terminal"
-              ? "text-white"
-              : "text-[#858585] hover:text-[#cccccc]"
-          }`}
+          className={`relative h-full text-[11px] flex items-center transition-all outline-none`}
+          style={{
+            color:
+              activeView === "terminal"
+                ? "var(--text-primary)"
+                : "var(--text-secondary)",
+          }}
         >
           Terminal
           {activeView === "terminal" && (
-            <div className="absolute bottom-0 left-0 w-full h-px bg-[#007acc]" />
+            <div
+              className="absolute bottom-0 left-0 w-full h-px"
+              style={{ backgroundColor: "var(--accent-color)" }}
+            />
           )}
         </button>
       </div>
 
-      {/* Tabs Header */}
       {activeView === "terminal" ? (
-        <div className="flex items-center bg-[#252526] border-y border-neutral-800 select-none">
+        <div
+          className="flex items-center border-y select-none"
+          style={{
+            backgroundColor: "var(--bg-secondary)",
+            borderColor: "var(--border-color)",
+          }}
+        >
           <div className="flex items-center overflow-x-auto no-scrollbar max-w-[calc(100%-80px)]">
             {terminals.map((term) => (
               <div
                 key={term.id}
                 onClick={() => setActiveId(term.id)}
                 className={`
-                group flex items-center gap-2 px-3 py-1.5 text-xs font-medium border-r border-neutral-800 cursor-pointer min-w-[100px] max-w-[200px]
-                ${
-                  activeId === term.id
-                    ? "bg-[#1e1e1e] text-white"
-                    : "bg-[#2d2d2d] text-neutral-400 hover:bg-[#2a2a2a]"
-                }
+                group flex items-center gap-2 px-3 py-1.5 text-xs font-medium border-r cursor-pointer min-w-[100px] max-w-[200px]
               `}
+                style={{
+                  backgroundColor:
+                    activeId === term.id
+                      ? "var(--bg-primary)"
+                      : "var(--bg-secondary)",
+                  color:
+                    activeId === term.id
+                      ? "var(--text-primary)"
+                      : "var(--text-secondary)",
+                  borderColor: "var(--border-color)",
+                }}
+                onMouseEnter={(e) => {
+                  if (activeId !== term.id) {
+                    e.currentTarget.style.backgroundColor =
+                      "var(--bg-tertiary)";
+                    e.currentTarget.style.color = "var(--text-primary)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeId !== term.id) {
+                    e.currentTarget.style.backgroundColor =
+                      "var(--bg-secondary)";
+                    e.currentTarget.style.color = "var(--text-secondary)";
+                  }
+                }}
               >
                 <span className="truncate flex-1">{term.title}</span>
                 <button
                   onClick={(e) => removeTerminal(e, term.id)}
-                  className={`opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-neutral-700 ${
+                  className={`opacity-0 group-hover:opacity-100 p-0.5 rounded transition-colors ${
                     terminals.length === 1 ? "hidden" : ""
                   }`}
+                  style={{ color: "var(--text-secondary)" }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      "var(--bg-tertiary)";
+                    e.currentTarget.style.color = "var(--text-primary)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.color = "var(--text-secondary)";
+                  }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -167,8 +229,20 @@ export const Terminal: React.FC<TerminalPanelProps> = ({ onClose }) => {
           {/* Add Button */}
           <button
             onClick={addTerminal}
-            className="flex items-center justify-center w-8 h-7.25 hover:bg-[#333] text-neutral-400 hover:text-white border-r border-neutral-800 transition-colors"
+            className="flex items-center justify-center w-8 h-7.25 border-r transition-colors"
             title="New Terminal"
+            style={{
+              borderColor: "var(--border-color)",
+              color: "var(--text-secondary)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+              e.currentTarget.style.color = "var(--text-primary)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = "var(--text-secondary)";
+            }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -191,7 +265,8 @@ export const Terminal: React.FC<TerminalPanelProps> = ({ onClose }) => {
           {/* Close Panel Button */}
           <button
             onClick={onClose}
-            className="flex items-center justify-center w-8 h-7.25 hover:bg-red-500/20 text-neutral-400 hover:text-red-400 transition-colors ml-auto"
+            className="flex items-center justify-center w-8 h-7.25 hover:bg-red-500/20 hover:text-red-400 transition-colors ml-auto"
+            style={{ color: "var(--text-secondary)" }}
             title="Close Panel"
           >
             <svg

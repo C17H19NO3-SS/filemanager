@@ -4,6 +4,7 @@ import { useEditor } from "@/providers/EditorProvider";
 import { getLanguageByExtension } from "@/utils/languages";
 import { vol } from "memfs";
 import { TAILWIND_CLASSES } from "../../utils/tailwind-classes";
+import { THEMES, THEME_RULES } from "../../utils/themes";
 
 export const Editor = () => {
   const {
@@ -343,7 +344,46 @@ export const Editor = () => {
       },
     });
 
-    monaco.editor.setTheme("vscode-dark-plus");
+    // Register all themes from THEMES util
+    Object.entries(THEMES).forEach(([themeKey, themeColors]) => {
+      if (themeKey === "vscode-dark-plus") return; // Handled specially below/above
+
+      const isLight = themeKey.includes("light");
+      const customRules = THEME_RULES[themeKey] || [];
+
+      monaco.editor.defineTheme(themeKey, {
+        base: isLight ? "vs" : "vs-dark",
+        inherit: true,
+        rules: customRules, // Apply custom syntax highlighting rules
+        colors: {
+          "editor.background": themeColors["--bg-primary"],
+          "editor.foreground": themeColors["--text-primary"],
+          "editor.lineHighlightBackground": themeColors["--bg-secondary"],
+          "editor.selectionBackground": themeColors["--selection-color"],
+          "editorCursor.foreground": themeColors["--text-primary"],
+          "editorIndentGuide.background": themeColors["--border-color"],
+          "editorIndentGuide.activeBackground": themeColors["--text-secondary"],
+        },
+      });
+    });
+
+    const themeToUse =
+      settings.theme in THEMES
+        ? settings.theme
+        : settings.theme.includes("light")
+          ? "vs-light"
+          : "vs-dark";
+
+    monaco.editor.setTheme(themeToUse);
+
+    // Inject custom CSS for our manual function highlighter
+    const style = document.createElement("style");
+    style.innerHTML = `
+      .token-custom-function {
+        color: #DCDCAA !important;
+      }
+    `;
+    document.head.appendChild(style);
 
     // Override the editor service to handle "Go to Definition" locally
     const editorService = (editor as any)._codeEditorService;
@@ -441,9 +481,61 @@ export const Editor = () => {
     monaco.editor.onDidChangeMarkers(updateMarkers);
     updateMarkers();
 
-    // Auto Rename Tag implementation
+    // Manual Function Highlighter (Regex-based fallback)
+    // This guarantees that "method()" calls are yellow, even if semantic tokens fail.
+    const customDecorations = editor.createDecorationsCollection([]);
+    const updateCustomDecorations = () => {
+      const model = editor.getModel();
+      if (!model) return;
+
+      const code = model.getValue();
+      const newDecorations: any[] = [];
+      // Regex to find identifier followed by '(':  word  (
+      const regex = /\b([a-zA-Z_$][\w$]*)\s*(?=\()/g;
+
+      const keywords = new Set([
+        "if",
+        "for",
+        "while",
+        "switch",
+        "catch",
+        "return",
+        "await",
+        "function",
+        "class",
+        "super",
+        "constructor",
+      ]);
+
+      let match;
+      while ((match = regex.exec(code)) !== null) {
+        const word = match[1];
+        if (keywords.has(word)) continue; // Skip keywords like if(...)
+
+        const startPos = model.getPositionAt(match.index);
+        const endPos = model.getPositionAt(match.index + word.length);
+
+        newDecorations.push({
+          range: new monaco.Range(
+            startPos.lineNumber,
+            startPos.column,
+            endPos.lineNumber,
+            endPos.column,
+          ),
+          options: {
+            inlineClassName: "token-custom-function",
+          },
+        });
+      }
+
+      customDecorations.set(newDecorations);
+    };
+
     let isUpdatingTags = false;
     editor.onDidChangeModelContent((e) => {
+      // Run custom highlighter
+      updateCustomDecorations();
+
       if (isUpdatingTags) return;
       const model = editor.getModel();
       if (!model) return;
@@ -543,6 +635,16 @@ export const Editor = () => {
     monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
       noSemanticValidation: false,
       noSyntaxValidation: false,
+    });
+
+    // Enforce semantic tokens
+    monaco.languages.typescript.typescriptDefaults.setModeConfiguration({
+      ...monaco.languages.typescript.typescriptDefaults.modeConfiguration,
+      semanticTokens: true,
+    });
+    monaco.languages.typescript.javascriptDefaults.setModeConfiguration({
+      ...monaco.languages.typescript.javascriptDefaults.modeConfiguration,
+      semanticTokens: true,
     });
 
     monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
@@ -710,6 +812,19 @@ export const Editor = () => {
 
     return () => snippetsProvider.dispose();
   }, [monacoRef.current]);
+
+  // Listen for theme changes to update Editor instantly
+  useEffect(() => {
+    if (monacoRef.current) {
+      const themeToUse =
+        settings.theme in THEMES
+          ? settings.theme
+          : settings.theme.includes("light")
+            ? "vs-light"
+            : "vs-dark";
+      monacoRef.current.editor.setTheme(themeToUse);
+    }
+  }, [settings.theme]);
 
   // Global Shortcut Handlers
   useEffect(() => {

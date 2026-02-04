@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import { vol } from "memfs";
+import { THEMES } from "../utils/themes";
 
 interface EditorSettings {
   fontSize: number;
@@ -133,6 +134,21 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
       return updated;
     });
   };
+
+  // Global Theme Management
+  useEffect(() => {
+    const targetTheme = THEMES[settings.theme] || THEMES["vscode-dark-plus"];
+    const root = document.documentElement;
+
+    Object.entries(targetTheme).forEach(([key, value]) => {
+      root.style.setProperty(key, value);
+    });
+
+    // Also update meta theme-color
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", targetTheme["--bg-secondary"]);
+  }, [settings.theme]);
 
   const setWorkspace = (path: string) => {
     setWorkspaceState(path);

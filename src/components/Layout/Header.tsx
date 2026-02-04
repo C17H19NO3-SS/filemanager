@@ -24,21 +24,33 @@ export const Header = () => {
     : "Project Root";
 
   return (
-    <header className="flex items-center justify-between bg-[#3c3c3c] text-[#cccccc] h-[35px] px-3 select-none border-b border-[#2b2b2b] z-50">
+    <header
+      className="flex items-center justify-between h-[35px] px-3 select-none border-b z-50 transition-colors"
+      style={{
+        backgroundColor: "var(--bg-secondary)",
+        color: "var(--text-primary)",
+        borderColor: "var(--border-color)",
+      }}
+    >
       {/* Left Section: Branding & Sidebar Toggle */}
       <div className="flex items-center gap-2">
-        <div className="w-5 h-5 bg-[#007acc] rounded-[3px] flex items-center justify-center text-white text-[10px] font-bold shadow-sm mr-1">
+        <div
+          className="w-5 h-5 rounded-[3px] flex items-center justify-center text-white text-[10px] font-bold shadow-sm mr-1"
+          style={{ backgroundColor: "var(--accent-color)" }}
+        >
           FM
         </div>
 
         <div className="flex items-center gap-1 ml-1">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className={`p-1 rounded-[3px] transition-colors ${
-              isSidebarOpen
-                ? "text-[#007acc] bg-[#454545]"
-                : "hover:bg-[#505050]"
-            }`}
+            className={`p-1 rounded-[3px] transition-colors`}
+            style={{
+              color: isSidebarOpen ? "var(--accent-color)" : "inherit",
+              backgroundColor: isSidebarOpen
+                ? "var(--bg-tertiary)"
+                : "transparent",
+            }}
             title="Toggle Sidebar (Ctrl+B)"
           >
             <PanelLeft size={16} />
@@ -46,11 +58,13 @@ export const Header = () => {
 
           <button
             onClick={() => setIsTerminalOpen(!isTerminalOpen)}
-            className={`p-1 rounded-[3px] transition-colors ${
-              isTerminalOpen
-                ? "text-[#007acc] bg-[#454545]"
-                : "hover:bg-[#505050]"
-            }`}
+            className={`p-1 rounded-[3px] transition-colors`}
+            style={{
+              color: isTerminalOpen ? "var(--accent-color)" : "inherit",
+              backgroundColor: isTerminalOpen
+                ? "var(--bg-tertiary)"
+                : "transparent",
+            }}
             title="Toggle Terminal"
           >
             <TerminalIcon size={16} />
@@ -60,9 +74,21 @@ export const Header = () => {
 
       {/* Center Section: Breadcrumbs / Title */}
       <div className="flex-1 flex justify-center items-center px-4 overflow-hidden">
-        <div className="flex items-center gap-1.5 text-[12px] text-[#969696] bg-[#2d2d2d] px-3 py-1 rounded-md border border-[#454545] max-w-[60%] truncate shadow-sm">
+        <div
+          className="flex items-center gap-1.5 text-[12px] px-3 py-1 rounded-md border max-w-[60%] truncate shadow-sm transition-colors"
+          style={{
+            backgroundColor: "var(--bg-input)",
+            borderColor: "var(--border-color)",
+            color: "var(--text-secondary)",
+          }}
+        >
           <Search size={12} className="shrink-0" />
-          <span className="font-semibold text-[#cccccc]">{workspaceName}</span>
+          <span
+            className="font-semibold"
+            style={{ color: "var(--text-primary)" }}
+          >
+            {workspaceName}
+          </span>
           {activeFile && (
             <>
               <ChevronRight size={12} className="shrink-0" />
@@ -78,7 +104,8 @@ export const Header = () => {
       <div className="flex items-center gap-1">
         <button
           onClick={() => setIsSettingsOpen(true)}
-          className="p-1.5 hover:bg-[#505050] rounded-[3px] transition-colors"
+          className="p-1.5 rounded-[3px] transition-colors hover:brightness-110"
+          style={{ backgroundColor: "transparent" }}
           title="Settings"
         >
           <Settings size={16} />

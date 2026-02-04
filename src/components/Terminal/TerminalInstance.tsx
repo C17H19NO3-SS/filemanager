@@ -3,6 +3,7 @@ import { Terminal as XTerminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import "xterm/css/xterm.css";
 import { useEditor } from "@/providers/EditorProvider";
+import { THEMES } from "../../utils/themes";
 
 interface TerminalInstanceProps {
   isActive: boolean;
@@ -23,7 +24,24 @@ export const TerminalInstance: React.FC<TerminalInstanceProps> = ({
   const history = useRef<string[]>([]);
   const historyIndex = useRef<number>(-1);
   const currentInput = useRef<string>(""); // Tracks what is currently on the prompt line
-  const { workspace } = useEditor();
+  const { workspace, settings } = useEditor();
+
+  // Update terminal theme dynamically
+  useEffect(() => {
+    if (xtermRef.current) {
+      const activeTheme = THEMES[settings.theme] || THEMES["vscode-dark-plus"];
+
+      const bg = activeTheme["--bg-primary"];
+      const fg = activeTheme["--text-primary"];
+
+      xtermRef.current.options.theme = {
+        background: bg,
+        foreground: fg,
+        cursor: fg,
+        cursorAccent: bg,
+      };
+    }
+  }, [settings.theme]);
 
   // Re-run fit when active changes
   useEffect(() => {
@@ -42,13 +60,17 @@ export const TerminalInstance: React.FC<TerminalInstanceProps> = ({
     if (!terminalRef.current) return;
 
     // Initialize xterm
+    const activeTheme = THEMES[settings.theme] || THEMES["vscode-dark-plus"];
+
     const term = new XTerminal({
       cursorBlink: true,
       fontSize: 14,
-      fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+      fontFamily: "'Consolas', 'Courier New', monospace",
       theme: {
-        background: "#1e1e1e",
-        foreground: "#d4d4d4",
+        background: activeTheme["--bg-primary"],
+        foreground: activeTheme["--text-primary"],
+        cursor: activeTheme["--text-primary"],
+        cursorAccent: activeTheme["--bg-primary"],
       },
       allowProposedApi: true,
       convertEol: true,
@@ -310,7 +332,10 @@ export const TerminalInstance: React.FC<TerminalInstanceProps> = ({
   }, [workspace, sessionId]); // Re-connect if workspace or session changes
 
   return (
-    <div className="relative h-full w-full bg-[#1e1e1e]">
+    <div
+      className="relative h-full w-full"
+      style={{ backgroundColor: "var(--bg-primary)" }}
+    >
       <div className="absolute top-2 right-4 z-10 opacity-0 hover:opacity-100 transition-opacity">
         <button
           onClick={clear}

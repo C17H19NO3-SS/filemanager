@@ -222,12 +222,24 @@ const TreeItem = ({ node, depth }: { node: FileNode; depth: number }) => {
   return (
     <div>
       <div
-        className={`flex items-center h-[22px] px-2 cursor-pointer group select-none relative transition-colors ${
-          isSelected
-            ? "bg-[#37373d] text-white"
-            : "text-[#cccccc] hover:bg-[#2a2d2e]"
-        }`}
-        style={{ paddingLeft: `${paddingLeft}px` }}
+        className={`flex items-center h-[22px] px-2 cursor-pointer group select-none relative transition-colors`}
+        style={{
+          paddingLeft: `${paddingLeft}px`,
+          backgroundColor: isSelected
+            ? "var(--selection-color)"
+            : "transparent",
+          color: isSelected ? "white" : "var(--text-primary)",
+        }}
+        onMouseEnter={(e) => {
+          if (!isSelected) {
+            e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isSelected) {
+            e.currentTarget.style.backgroundColor = "transparent";
+          }
+        }}
         onClick={handleClick}
       >
         {/* Indent Lines */}
@@ -338,8 +350,17 @@ export const Sidebar = () => {
   }, [files]);
 
   return (
-    <aside className="w-full bg-[#181818] flex flex-col h-full border-r border-[#2b2b2b] select-none">
-      <div className="flex items-center justify-between px-4 py-2 text-[#bbbbbb] group/header hover:text-white cursor-pointer h-9">
+    <aside
+      className="w-full flex flex-col h-full border-r select-none"
+      style={{
+        backgroundColor: "var(--bg-secondary)",
+        borderColor: "var(--border-color)",
+      }}
+    >
+      <div
+        className="flex items-center justify-between px-4 py-2 group/header cursor-pointer h-9 transition-colors"
+        style={{ color: "var(--text-secondary)" }}
+      >
         <div className="flex items-center gap-1.5 overflow-hidden">
           <svg
             className="w-3.5 h-3.5 shrink-0"
